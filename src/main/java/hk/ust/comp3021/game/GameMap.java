@@ -6,7 +6,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 
+import javax.print.attribute.standard.Destination;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -23,9 +26,12 @@ import java.util.Set;
 public class GameMap {
     public int _width;
     public int _height;
-    public ArrayList<Position> _initialBoxDest;
-    public static ArrayList<Player> _players;
-    public static Set<Position> _playerDest;
+    public static String[] _mapString;
+    public Set<Position> _initialBoxDest;
+    public static ArrayList<Position> _movableBox;
+    public static ArrayList<Integer> _players;
+    public static ArrayList<Position> _playerDest;
+    public static ArrayList<Position> _wall;
     public static int _undoLimit;
 
     /**
@@ -43,7 +49,7 @@ public class GameMap {
         // TODO
         _width = maxWidth;
         _height = maxHeight;
-        _initialBoxDest = (ArrayList<Position>) destinations;
+        _initialBoxDest = destinations;
         _undoLimit = undoLimit;
 //        throw new NotImplementedException();
     }
@@ -85,30 +91,41 @@ public class GameMap {
      */
     public static GameMap parse(String mapText) {
         // TODO
-        String[] string = mapText.split("\n");
-        if(string[0] =="-1") throw new IllegalArgumentException("It should not be a negative value");
-        Set<Position> boxDest = null;
+        _mapString = mapText.split("\n");
+        if(Integer.parseInt(_mapString[0]) <-1) throw new IllegalArgumentException("It should not be a negative value");
+        Set<Position> boxDest = new HashSet<>();
         _players = new ArrayList<>();
-        for(int i =2;i<string.length;i++){
-            for(int j =0; j<string[i].length();j++){
-                if(string[i].charAt(j) == '@'){
-                    boxDest.add(Position.of(i,j));
+        _playerDest = new ArrayList<>();
+        _movableBox = new ArrayList<>();
+        _wall = new ArrayList<>();
+        for(int i =1; i<_mapString.length; i++){
+            _wall.add(new Position(0,i));
+        }
+        for(int i =1;i<_mapString.length;i++){
+            for(int j =0; j<_mapString[i].length();j++){
+                if(_mapString[i].charAt(j) == '@'){
+                    System.out.print("Added a destination");
+                    boxDest.add(new Position(i-1,j));
                 }
-                else if(string[i].charAt(j)>= 'A' && string[i].charAt(j) <= 'Z'){
-                    if(_players.contains(string[i].charAt(j)-'A')){
+                else if(_mapString[i].charAt(j)>= 'A' && _mapString[i].charAt(j) <= 'Z'){
+                    if(_players.contains(_mapString[i].charAt(j)-'A')){
                         throw new IllegalArgumentException("There should not be duplicate players");
                     }
                     else{
-                        _playerDest.add(Position.of(i,j));
+                        _players.add(_mapString[i].charAt(j)-'A');
+                        _playerDest.add(new Position(i-1,j));
                     }
                 }
-                else if(string[i].charAt(j)>= 'a' && string[i].charAt(j) <= 'z'){
-
+                else if(_mapString[i].charAt(j)>= 'a' && _mapString[i].charAt(j) <= 'z'){
+                    _movableBox.add(new Position(i-1,j));
+                }
+                else if(_mapString[i].charAt(j) == '#'){
+                    _wall.add(new Position(i-1,j));
                 }
             }
         }
         if(_players.size() ==0) throw new IllegalArgumentException("There should be at least 1 player");
-        return new GameMap(string[1].length(),string.length,boxDest,Integer.parseInt(string[0]));
+        return new GameMap(_mapString[1].length(),_mapString.length-1, boxDest,Integer.parseInt(_mapString[0]));
 //        throw new NotImplementedException();
     }
 
@@ -121,7 +138,22 @@ public class GameMap {
     @Nullable
     public Entity getEntity(Position position) {
         // TODO
-        throw new NotImplementedException();
+        int x = position.x()+1;
+        int y = position.y();
+        char _char = _mapString[x].charAt(y);
+        System.out.print(_char+"\n");
+        if (_char>= 'A' && _char<='Z' ){
+            return new Player(_char -'A');
+        }else if(_char>='a' && _char <='z'){
+            return new Box(Character.toUpperCase(_char));
+        } else if (_char =='#') {
+            return new Wall();
+        }
+        else if(_char =='@'){
+            return new Box(0);
+        }
+        return new Empty();
+//        throw new NotImplementedException();
     }
 
     /**
@@ -132,6 +164,7 @@ public class GameMap {
      */
     public void putEntity(Position position, Entity entity) {
         // TODO
+
         throw new NotImplementedException();
     }
 
@@ -142,7 +175,9 @@ public class GameMap {
      */
     public @NotNull @Unmodifiable Set<Position> getDestinations() {
         // TODO
-        throw new NotImplementedException();
+        System.out.print(_initialBoxDest.toString());
+        return _initialBoxDest;
+//        throw new NotImplementedException();
     }
 
     /**
@@ -163,7 +198,8 @@ public class GameMap {
      */
     public Set<Integer> getPlayerIds() {
         // TODO
-        throw new NotImplementedException();
+        return new HashSet<>(_players);
+//        throw new NotImplementedException();
     }
 
     /**
@@ -173,7 +209,8 @@ public class GameMap {
      */
     public int getMaxWidth() {
         // TODO
-        throw new NotImplementedException();
+        return _width;
+//        throw new NotImplementedException();
     }
 
     /**
@@ -183,6 +220,7 @@ public class GameMap {
      */
     public int getMaxHeight() {
         // TODO
-        throw new NotImplementedException();
+        return _height;
+//        throw new NotImplementedException();
     }
 }
