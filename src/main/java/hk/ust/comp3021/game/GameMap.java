@@ -21,10 +21,12 @@ import java.util.Set;
  * GameBoard is capable to create many GameState instances, each representing an ongoing game.
  */
 public class GameMap {
-    public int width;
-    public int height;
-    public ArrayList<Position> dest = new ArrayList<>();
-    public int _undoLimit;
+    public int _width;
+    public int _height;
+    public ArrayList<Position> _initialBoxDest;
+    public static ArrayList<Player> _players;
+    public static Set<Position> _playerDest;
+    public static int _undoLimit;
 
     /**
      * Create a new GameMap with width, height, set of box destinations and undo limit.
@@ -39,11 +41,11 @@ public class GameMap {
      */
     public GameMap(int maxWidth, int maxHeight, Set<Position> destinations, int undoLimit) {
         // TODO
-        width = maxWidth;
-        height = maxHeight;
-        dest = (ArrayList<Position>) destinations;
+        _width = maxWidth;
+        _height = maxHeight;
+        _initialBoxDest = (ArrayList<Position>) destinations;
         _undoLimit = undoLimit;
-        throw new NotImplementedException();
+//        throw new NotImplementedException();
     }
 
     /**
@@ -83,7 +85,31 @@ public class GameMap {
      */
     public static GameMap parse(String mapText) {
         // TODO
-        throw new NotImplementedException();
+        String[] string = mapText.split("\n");
+        if(string[0] =="-1") throw new IllegalArgumentException("It should not be a negative value");
+        Set<Position> boxDest = null;
+        _players = new ArrayList<>();
+        for(int i =2;i<string.length;i++){
+            for(int j =0; j<string[i].length();j++){
+                if(string[i].charAt(j) == '@'){
+                    boxDest.add(Position.of(i,j));
+                }
+                else if(string[i].charAt(j)>= 'A' && string[i].charAt(j) <= 'Z'){
+                    if(_players.contains(string[i].charAt(j)-'A')){
+                        throw new IllegalArgumentException("There should not be duplicate players");
+                    }
+                    else{
+                        _playerDest.add(Position.of(i,j));
+                    }
+                }
+                else if(string[i].charAt(j)>= 'a' && string[i].charAt(j) <= 'z'){
+
+                }
+            }
+        }
+        if(_players.size() ==0) throw new IllegalArgumentException("There should be at least 1 player");
+        return new GameMap(string[1].length(),string.length,boxDest,Integer.parseInt(string[0]));
+//        throw new NotImplementedException();
     }
 
     /**
@@ -126,7 +152,8 @@ public class GameMap {
      */
     public Optional<Integer> getUndoLimit() {
         // TODO
-        throw new NotImplementedException();
+        return Optional.of(_undoLimit);
+//        throw new NotImplementedException();
     }
 
     /**

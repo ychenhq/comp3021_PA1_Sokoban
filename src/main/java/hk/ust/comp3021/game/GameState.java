@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Set;
 
@@ -23,6 +24,9 @@ import java.util.Set;
  */
 public class GameState {
 
+    public Position curPosition;
+    public static ArrayList<Position> history;
+    public int undoQuotaRemain;
     /**
      * Create a running game state from a game map.
      *
@@ -30,7 +34,10 @@ public class GameState {
      */
     public GameState(@NotNull GameMap map) {
         // TODO
-        throw new NotImplementedException();
+//        curPosition = map._initialBoxDest.get(map._initialBoxDest.size()-1);
+        history = new ArrayList<>();
+        undoQuotaRemain = map._undoLimit;
+//        throw new NotImplementedException();
     }
 
     /**
@@ -41,7 +48,8 @@ public class GameState {
      */
     public @Nullable Position getPlayerPositionById(int id) {
         // TODO
-        throw new NotImplementedException();
+        return history.get(history.size()-1);
+//        throw new NotImplementedException();
     }
 
     /**
