@@ -1,12 +1,13 @@
 package hk.ust.comp3021.game;
 
-import hk.ust.comp3021.entities.Entity;
+import hk.ust.comp3021.entities.*;
 import hk.ust.comp3021.utils.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -24,9 +25,20 @@ import java.util.Set;
  */
 public class GameState {
 
-    public Position curPosition;
-    public static ArrayList<Position> history;
-    public int undoQuotaRemain;
+    public int _width;
+    public int _height;
+    public String[] _lastStepMap;
+    public String[] _checkpointMap;
+    public String[] _initialMap;
+    public String[] _mapString;
+    public Set<Position> _boxDest;
+    public ArrayList<Integer> _players;
+    public Set<Position> _playerPosition;
+    public ArrayList<Position> _wall;
+    public int _undoLimit;
+    public int _undo;
+    public ArrayList<Position> _historyMovements;
+    public boolean _hasCheckPoint;
     /**
      * Create a running game state from a game map.
      *
@@ -35,8 +47,14 @@ public class GameState {
     public GameState(@NotNull GameMap map) {
         // TODO
 //        curPosition = map._initialBoxDest.get(map._initialBoxDest.size()-1);
-        history = new ArrayList<>();
-        undoQuotaRemain = map._undoLimit;
+        _height = map._height;
+        _width = map._width;
+        _historyMovements = new ArrayList<>();
+        _undoLimit = map._undoLimit;
+        _mapString = map._mapStringNonStatic;
+        _players = map._playersNonStatic;
+        _wall = map._wallNonStatic;
+        _undo=0;
 //        throw new NotImplementedException();
     }
 
@@ -48,8 +66,15 @@ public class GameState {
      */
     public @Nullable Position getPlayerPositionById(int id) {
         // TODO
-        return history.get(history.size()-1);
-//        throw new NotImplementedException();
+        for(int i =1; i<_mapString.length;i++){
+            for(int j =0; j<_mapString[i].length();j++){
+                if(_mapString[i].charAt(j)-'A' == id){
+                    return new Position(j,i-1);
+                }
+            }
+        }
+
+        throw new IllegalArgumentException("There is no player with the given Id");
     }
 
     /**
@@ -59,7 +84,16 @@ public class GameState {
      */
     public @NotNull Set<Position> getAllPlayerPositions() {
         // TODO
-        throw new NotImplementedException();
+        _playerPosition = new HashSet<>();
+        for(int i =1; i<_mapString.length;i++){
+            for(int j =0; j<_mapString[i].length();j++){
+                if(_mapString[i].charAt(j) >='A'&& _mapString[i].charAt(j) <='Z'){
+                    _playerPosition.add(new Position(j,i-1));
+                }
+            }
+        }
+        return _playerPosition;
+//        throw new NotImplementedException();
     }
 
     /**
@@ -70,7 +104,22 @@ public class GameState {
      */
     public @Nullable Entity getEntity(@NotNull Position position) {
         // TODO
-        throw new NotImplementedException();
+        int x = position.x();
+        int y = position.y()+1;
+        char _char = _mapString[y].charAt(x);
+        System.out.print(_char+"\n");
+        if (_char>= 'A' && _char<='Z' ){
+            return new Player(_char -'A');
+        }else if(_char>='a' && _char <='z'){
+            return new Box(Character.toUpperCase(_char));
+        } else if (_char =='#') {
+            return new Wall();
+        }
+        else if(_char =='@'){
+            return new Box(0);
+        }
+        return new Empty();
+//        throw new NotImplementedException();
     }
 
     /**
@@ -81,7 +130,16 @@ public class GameState {
      */
     public @NotNull @Unmodifiable Set<Position> getDestinations() {
         // TODO
-        throw new NotImplementedException();
+        _boxDest = new HashSet<>();
+        for(int i =1; i<_mapString.length;i++){
+            for(int j =0; j<_mapString[i].length();j++){
+                if(_mapString[i].charAt(j) >='a'&& _mapString[i].charAt(j) <='z'){
+                    _boxDest.add(new Position(j,i-1));
+                }
+            }
+        }
+        return _boxDest;
+//        throw new NotImplementedException();
     }
 
     /**
@@ -93,7 +151,9 @@ public class GameState {
      */
     public Optional<Integer> getUndoQuota() {
         // TODO
-        throw new NotImplementedException();
+        int remain = _undoLimit - _undo;
+        return Optional.of(remain);
+//        throw new NotImplementedException();
     }
 
     /**
@@ -104,7 +164,16 @@ public class GameState {
      */
     public boolean isWin() {
 // TODO
-        throw new NotImplementedException();
+        for(Position pos : _boxDest){
+            int x = pos.x();
+            int y = pos.y()+1;
+            if(!(_mapString[y].charAt(x)>='a' && _mapString[x].charAt(y)<='z')){
+                return false;
+            }
+        }
+
+        return true;
+//        throw new NotImplementedException();
     }
 
     /**
@@ -117,7 +186,20 @@ public class GameState {
      */
     public void move(Position from, Position to) {
         // TODO
-        throw new NotImplementedException();
+//        _historyMovements.add(from);
+//        _historyMovements.add(to);
+        int x_from = from.x();
+        int y_from = from.y()+1;
+        int x_to = to.x();
+        int y_to = to.y()+1;
+        char charFrom = _mapString[y_from].charAt(x_from);
+        char charTo = _mapString[y_to].charAt(x_to);
+        if(charFrom>='a' && charFrom<='z'){
+            _lastStepMap = _mapString;
+        }
+        _mapString[y_from] = _mapString[y_from].substring(0,x_from)+charTo+ _mapString[y_from].substring(x_from+1);
+        _mapString[y_to] = _mapString[y_to].substring(0,x_to)+charFrom+_mapString[y_to].substring(x_to+1);
+//        throw new NotImplementedException();
     }
 
     /**
@@ -130,7 +212,23 @@ public class GameState {
      */
     public void checkpoint() {
         // TODO
-        throw new NotImplementedException();
+        _hasCheckPoint = true;
+        _checkpointMap = _lastStepMap;
+//        Position from = _historyMovements.get(_historyMovements.size()-2);
+//        Position to = _historyMovements.get(_historyMovements.size()-1);
+//        int x_from = from.x();
+//        int y_from = from.y()+1;
+//        int x_to = to.x();
+//        int y_to = to.y()+1;
+//        char charFrom = _checkpointMap[y_from].charAt(x_from);
+//        char charTo = _checkpointMap[y_to].charAt(x_to);
+//        _checkpointMap[y_from] = _checkpointMap[y_from].substring(0,x_from)+charTo+ _checkpointMap[y_from].substring(x_from+1);
+//        _checkpointMap[y_to] = _checkpointMap[y_to].substring(0,x_to)+charFrom+_checkpointMap[y_to].substring(x_to+1);
+//        _undo++;
+//        _historyMovements.remove(_historyMovements.size()-2);
+//        _historyMovements.remove(_historyMovements.size()-1);
+
+//        throw new NotImplementedException();
     }
 
     /**
@@ -142,7 +240,16 @@ public class GameState {
      */
     public void undo() {
         // TODO
-        throw new NotImplementedException();
+        if(_hasCheckPoint){
+            _mapString = _checkpointMap;
+            _undo++;
+        }else{
+            _hasCheckPoint = false;
+            _mapString = _initialMap;
+            _undo++;
+        }
+
+//        throw new NotImplementedException();
     }
 
     /**
@@ -153,7 +260,8 @@ public class GameState {
      */
     public int getMapMaxWidth() {
         // TODO
-        throw new NotImplementedException();
+        return  _width;
+//        throw new NotImplementedException();
     }
 
     /**
@@ -164,6 +272,7 @@ public class GameState {
      */
     public int getMapMaxHeight() {
         // TODO
-        throw new NotImplementedException();
+        return _height;
+//        throw new NotImplementedException();
     }
 }
