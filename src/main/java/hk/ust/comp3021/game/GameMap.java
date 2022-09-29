@@ -96,6 +96,8 @@ public class GameMap {
      * @throws IllegalArgumentException if there are boxes whose {@link Box#getPlayerId()} do not match any player on the game board,
      *                                  or if there are players that have no corresponding boxes.
      */
+
+
     public static GameMap parse(String mapText) {
         // TODO
         _mapString = mapText.split("\n");
@@ -105,10 +107,12 @@ public class GameMap {
         _playerDest = new ArrayList<>();
         _movableBox = new ArrayList<>();
         _wall = new ArrayList<>();
+        int largestWidth =0;
         for(int i =1; i<_mapString.length; i++){
             _wall.add(new Position(i,0));
         }
         for(int i =1;i<_mapString.length;i++){
+            largestWidth = _mapString[i].length()>largestWidth? _mapString[i].length():largestWidth;
             for(int j =0; j<_mapString[i].length();j++){
                 if(_mapString[i].charAt(j) == '@'){
 //                    System.out.print("Added a destination");
@@ -131,9 +135,23 @@ public class GameMap {
                 }
             }
         }
+//        System.out.print("largestWidth = " +largestWidth);
+        resetMap(largestWidth);
         if(_players.size() ==0) throw new IllegalArgumentException("There should be at least 1 player");
-        return new GameMap(_mapString[1].length(),_mapString.length-1, boxDest,Integer.parseInt(_mapString[0]));
+        return new GameMap(largestWidth,_mapString.length-1, boxDest,Integer.parseInt(_mapString[0]));
 //        throw new NotImplementedException();
+    }
+
+    //helper function
+    public static void resetMap(int largestWidth){
+        for(int i =1; i<_mapString.length;i++){
+            int length = largestWidth-_mapString[i].length();
+            for(int j =0; j<length;j++){
+                _mapString[i] = _mapString[i] +' ';
+            }
+//            System.out.print(_mapString[i]+"\n");
+//            System.out.print("_mapString[y].length()="+_mapString[i].length()+'\n');
+        }
     }
 
     /**
@@ -147,8 +165,9 @@ public class GameMap {
         // TODO
         int x = position.x();
         int y = position.y()+1;
+        if(x>= _width || y>=_height)return null;
         char _char = _mapString[y].charAt(x);
-        System.out.print(_char+"\n");
+//        System.out.print(_char+"\n");
         if (_char>= 'A' && _char<='Z' ){
             return new Player(_char -'A');
         }else if(_char>='a' && _char <='z'){
@@ -156,9 +175,10 @@ public class GameMap {
         } else if (_char =='#') {
             return new Wall();
         }
-        else{
+        else if(_char =='.' || _char =='@'){
             return new Empty();
         }
+        else return null;
 //        throw new NotImplementedException();
     }
 
@@ -181,7 +201,7 @@ public class GameMap {
      */
     public @NotNull @Unmodifiable Set<Position> getDestinations() {
         // TODO
-        System.out.print(_initialBoxDest.toString());
+//        System.out.print(_initialBoxDest.toString());
         return _initialBoxDest;
 //        throw new NotImplementedException();
     }

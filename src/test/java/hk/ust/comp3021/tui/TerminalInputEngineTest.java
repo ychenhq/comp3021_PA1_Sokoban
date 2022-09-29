@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -21,7 +22,6 @@ class TerminalInputEngineTest {
 
         final var inputEngine = new TerminalInputEngine(inputStream);
         final var action = inputEngine.fetchAction();
-
         assertTrue(action instanceof Exit);
     }
 

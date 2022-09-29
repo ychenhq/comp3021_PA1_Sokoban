@@ -55,6 +55,7 @@ public class GameState {
         _players = map._playersNonStatic;
         _wall = map._wallNonStatic;
         _undo=0;
+        _boxDest = map._initialBoxDest;
 //        throw new NotImplementedException();
     }
 
@@ -106,19 +107,20 @@ public class GameState {
         // TODO
         int x = position.x();
         int y = position.y()+1;
+        if(x>= _width || y>=_height)return null;
+//        System.out.print(_mapString[y].length()+'\n');
         char _char = _mapString[y].charAt(x);
         System.out.print(_char+"\n");
         if (_char>= 'A' && _char<='Z' ){
             return new Player(_char -'A');
         }else if(_char>='a' && _char <='z'){
-            return new Box(Character.toUpperCase(_char));
-        } else if (_char =='#') {
+            return new Box(Character.toLowerCase(_char)-'A');
+        } else if(_char =='.' || _char =='@'){
+            return new Empty();
+        }else if(_char == '#'){
             return new Wall();
         }
-        else if(_char =='@'){
-            return new Box(0);
-        }
-        return new Empty();
+        else return null;
 //        throw new NotImplementedException();
     }
 
@@ -186,16 +188,16 @@ public class GameState {
      */
     public void move(Position from, Position to) {
         // TODO
-//        _historyMovements.add(from);
-//        _historyMovements.add(to);
         int x_from = from.x();
         int y_from = from.y()+1;
         int x_to = to.x();
         int y_to = to.y()+1;
         char charFrom = _mapString[y_from].charAt(x_from);
         char charTo = _mapString[y_to].charAt(x_to);
+//        _historyMovements.add(from);
+//        _historyMovements.add(to);
         if(charFrom>='a' && charFrom<='z'){
-            _lastStepMap = _mapString;
+            _lastStepMap = _mapString.clone();
         }
         _mapString[y_from] = _mapString[y_from].substring(0,x_from)+charTo+ _mapString[y_from].substring(x_from+1);
         _mapString[y_to] = _mapString[y_to].substring(0,x_to)+charFrom+_mapString[y_to].substring(x_to+1);
@@ -214,6 +216,7 @@ public class GameState {
         // TODO
         _hasCheckPoint = true;
         _checkpointMap = _lastStepMap;
+//        System.out.print( "_lastStepMap2" + _lastStepMap[2].toString()+'\n');
 //        Position from = _historyMovements.get(_historyMovements.size()-2);
 //        Position to = _historyMovements.get(_historyMovements.size()-1);
 //        int x_from = from.x();
@@ -241,12 +244,15 @@ public class GameState {
     public void undo() {
         // TODO
         if(_hasCheckPoint){
-            _mapString = _checkpointMap;
+//            System.out.print("has check point");
+//            System.out.print("_mapString"+ _mapString[2].toString());
+//            System.out.print("_checkpointMap"+ _checkpointMap[2].toString());
+            _mapString = _checkpointMap.clone();
             _undo++;
-        }else{
             _hasCheckPoint = false;
+        }else{
             _mapString = _initialMap;
-            _undo++;
+            _undo=0;
         }
 
 //        throw new NotImplementedException();

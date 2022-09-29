@@ -2,11 +2,18 @@ package hk.ust.comp3021.game;
 
 import hk.ust.comp3021.actions.Action;
 import hk.ust.comp3021.actions.ActionResult;
+import hk.ust.comp3021.actions.Exit;
 import hk.ust.comp3021.actions.Move;
+import hk.ust.comp3021.tui.TerminalInputEngine;
 import hk.ust.comp3021.utils.TestHelper;
 import hk.ust.comp3021.utils.TestKind;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
@@ -88,6 +95,17 @@ class AbstractSokobanGameTest {
         assertTrue(game.shouldStop());
     }
 
+    @Tag(TestKind.PUBLIC)
+    @Test
+    void testShouldStopWhenExit() {
+        final var gameState = mock(GameState.class);
+        final var game = new SokobanGameForTesting(gameState);
+        final var inputStream = fixValueStream("exit");
+
+        final var inputEngine = new Scanner(inputStream);
+        assertTrue(game.shouldStop());
+    }
+
     private static class SokobanGameForTesting extends AbstractSokobanGame {
 
         protected SokobanGameForTesting(GameState gameState) {
@@ -101,5 +119,10 @@ class AbstractSokobanGameTest {
         public ActionResult feedActionForProcessing(Action action) {
             return processAction(action);
         }
+    }
+
+    private InputStream fixValueStream(String content) {
+        final var bytes = content.getBytes(StandardCharsets.UTF_8);
+        return new ByteArrayInputStream(bytes);
     }
 }
