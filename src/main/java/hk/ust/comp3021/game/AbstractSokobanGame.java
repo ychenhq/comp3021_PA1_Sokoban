@@ -50,7 +50,6 @@ public abstract class AbstractSokobanGame implements SokobanGame {
         Position leftPosition = new Position(oldPosition.x()-1, oldPosition.y());
         Position upPosition = new Position(oldPosition.x(), oldPosition.y()-1);
 
-        System.out.print(action.getClass() == Move.Left.class);
         if(action.getClass() == Move.Down.class){
             if (state.getEntity(downPosition).getClass() == Empty.class){
                 state.move(oldPosition,downPosition );
