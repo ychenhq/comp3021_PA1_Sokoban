@@ -1,7 +1,6 @@
 package hk.ust.comp3021.game;
 
-import hk.ust.comp3021.actions.Action;
-import hk.ust.comp3021.actions.ActionResult;
+import hk.ust.comp3021.actions.*;
 //import hk.ust.comp3021.actions.Exit;
 //import hk.ust.comp3021.actions.Move;
 import hk.ust.comp3021.entities.Box;
@@ -51,76 +50,142 @@ public abstract class AbstractSokobanGame implements SokobanGame {
         Position leftPosition = new Position(oldPosition.x()-1, oldPosition.y());
         Position upPosition = new Position(oldPosition.x(), oldPosition.y()-1);
 
-//        System.out.print(action.getClass().getName());
-        switch (action.getClass().getName()){
-            case "hk.ust.comp3021.actions.Move$Down":
-                if (state.getEntity(downPosition).getClass() == Empty.class){
-                    state.move(oldPosition,downPosition );
-                    return new ActionResult.Success(action);
-                } else if (state.getEntity(downPosition).getClass() == Box.class) {
-                    Position another = new Position(downPosition.x(), downPosition.y()+1);
-                    if(state.getEntity(another).getClass() ==Empty.class){
-                        state.move(downPosition,another);
-                        state.move(oldPosition,downPosition);
-                        state.checkpoint();
-                        return new ActionResult.Success(action);
-                    }else new ActionResult.Failed(action, "You have met a wall");
-                }
-                return new ActionResult.Failed(action, "You have met a wall");
-            case "hk.ust.comp3021.actions.Move$Right":
-                if (state.getEntity(rightPosition).getClass() == Empty.class) {
-                    state.move(oldPosition,rightPosition );
-                    return new ActionResult.Success(action);
-                }else if (state.getEntity(rightPosition).getClass() == Box.class) {
-                    Position another = new Position(rightPosition.x()+1, rightPosition.y());
-                    if(state.getEntity(another).getClass() ==Empty.class){
-                        state.move(rightPosition,another);
-                        state.move(oldPosition,rightPosition);
-                        state.checkpoint();
-                        return new ActionResult.Success(action);
-                    }else new ActionResult.Failed(action, "You have met a wall");
-                }
-                return new ActionResult.Failed(action, "You have met a wall");
-            case "hk.ust.comp3021.actions.Move$Left":
-                if (state.getEntity(leftPosition).getClass() == Empty.class) {
-                    state.move(oldPosition,leftPosition );
-                    return new ActionResult.Success(action);
-                }else if (state.getEntity(leftPosition).getClass() == Box.class) {
-                    Position another = new Position(leftPosition.x()-1, rightPosition.y());
-                    if(state.getEntity(another).getClass() ==Empty.class){
-                        state.move(leftPosition,another);
-                        state.move(oldPosition,leftPosition);
-                        state.checkpoint();
-                        return new ActionResult.Success(action);
-                    }else new ActionResult.Failed(action, "You have met a wall");
-                }
-                return new ActionResult.Failed(action, "You have met a wall");
-            case "hk.ust.comp3021.actions.Move$Up":
-                if (state.getEntity(upPosition).getClass() == Empty.class) {
-                    state.move(oldPosition,upPosition );
-                    return new ActionResult.Success(action);
-                }else if (state.getEntity(upPosition).getClass() == Box.class) {
-                    Position another = new Position(upPosition.x(), rightPosition.y()-1);
-                    if(state.getEntity(another).getClass() ==Empty.class){
-                        state.move(upPosition,another);
-                        state.move(oldPosition,upPosition);
-                        state.checkpoint();
-                        return new ActionResult.Success(action);
-                    }else new ActionResult.Failed(action, "You have met a wall");
-                }
-                return new ActionResult.Failed(action, "You have met a wall");
-            case "hk.ust.comp3021.actions.Move$Exit":
-                this.exit = true;
+        System.out.print(action.getClass() == Move.Left.class);
+        if(action.getClass() == Move.Down.class){
+            if (state.getEntity(downPosition).getClass() == Empty.class){
+                state.move(oldPosition,downPosition );
                 return new ActionResult.Success(action);
-            case "hk.ust.comp3021.actions.Move$Undo":
-                if(state.getUndoQuota().get()>0){
+            } else if (state.getEntity(downPosition).getClass() == Box.class) {
+                Position another = new Position(downPosition.x(), downPosition.y()+1);
+                if(state.getEntity(another).getClass() ==Empty.class){
+                    state.move(downPosition,another);
+                    state.move(oldPosition,downPosition);
+                    state.checkpoint();
                     return new ActionResult.Success(action);
-                }
-                return new ActionResult.Failed(action, UNDO_QUOTA_RUN_OUT);
-            default:
-                return new ActionResult.Failed(action, "You have met a wall");
-
+                }else new ActionResult.Failed(action, INVALID_INPUT_MESSAGE);
+            }
+            return new ActionResult.Failed(action, INVALID_INPUT_MESSAGE);
+        }else if (action.getClass() == Move.Right.class){
+            if (state.getEntity(rightPosition).getClass() == Empty.class) {
+                state.move(oldPosition,rightPosition );
+                return new ActionResult.Success(action);
+            }else if (state.getEntity(rightPosition).getClass() == Box.class) {
+                Position another = new Position(rightPosition.x()+1, rightPosition.y());
+                if(state.getEntity(another).getClass() ==Empty.class){
+                    state.move(rightPosition,another);
+                    state.move(oldPosition,rightPosition);
+                    state.checkpoint();
+                    return new ActionResult.Success(action);
+                }else new ActionResult.Failed(action, INVALID_INPUT_MESSAGE);
+            }
+            return new ActionResult.Failed(action, INVALID_INPUT_MESSAGE);
+        } else if (action.getClass() == Move.Left.class) {
+            if (state.getEntity(leftPosition).getClass() == Empty.class) {
+                state.move(oldPosition,leftPosition );
+                return new ActionResult.Success(action);
+            }else if (state.getEntity(leftPosition).getClass() == Box.class) {
+                Position another = new Position(leftPosition.x()-1, rightPosition.y());
+                if(state.getEntity(another).getClass() ==Empty.class){
+                    state.move(leftPosition,another);
+                    state.move(oldPosition,leftPosition);
+                    state.checkpoint();
+                    return new ActionResult.Success(action);
+                }else new ActionResult.Failed(action, INVALID_INPUT_MESSAGE);
+            }
+            return new ActionResult.Failed(action, INVALID_INPUT_MESSAGE);
+        } else if (action.getClass() == Move.Up.class) {
+            if (state.getEntity(upPosition).getClass() == Empty.class) {
+                state.move(oldPosition,upPosition );
+                return new ActionResult.Success(action);
+            }else if (state.getEntity(upPosition).getClass() == Box.class) {
+                Position another = new Position(upPosition.x(), rightPosition.y()-1);
+                if(state.getEntity(another).getClass() ==Empty.class){
+                    state.move(upPosition,another);
+                    state.move(oldPosition,upPosition);
+                    state.checkpoint();
+                    return new ActionResult.Success(action);
+                }else new ActionResult.Failed(action, INVALID_INPUT_MESSAGE);
+            }
+            return new ActionResult.Failed(action, INVALID_INPUT_MESSAGE);
+        } else if (action.getClass() == Exit.class) {
+            this.exit = true;
+            return new ActionResult.Success(action);
+        } else if (action.getClass() == Undo.class) {
+            if(state.getUndoQuota().get()>0){
+                return new ActionResult.Success(action);
+            }
+            return new ActionResult.Failed(action, UNDO_QUOTA_RUN_OUT);
         }
+        return new ActionResult.Failed(action, INVALID_INPUT_MESSAGE);
+//        switch (action.getClass().getName()){
+//            case "hk.ust.comp3021.actions.Move$Down":
+//                if (state.getEntity(downPosition).getClass() == Empty.class){
+//                    state.move(oldPosition,downPosition );
+//                    return new ActionResult.Success(action);
+//                } else if (state.getEntity(downPosition).getClass() == Box.class) {
+//                    Position another = new Position(downPosition.x(), downPosition.y()+1);
+//                    if(state.getEntity(another).getClass() ==Empty.class){
+//                        state.move(downPosition,another);
+//                        state.move(oldPosition,downPosition);
+//                        state.checkpoint();
+//                        return new ActionResult.Success(action);
+//                    }else new ActionResult.Failed(action, "You have met a wall");
+//                }
+//                return new ActionResult.Failed(action, "You have met a wall");
+//            case "hk.ust.comp3021.actions.Move$Right":
+//                if (state.getEntity(rightPosition).getClass() == Empty.class) {
+//                    state.move(oldPosition,rightPosition );
+//                    return new ActionResult.Success(action);
+//                }else if (state.getEntity(rightPosition).getClass() == Box.class) {
+//                    Position another = new Position(rightPosition.x()+1, rightPosition.y());
+//                    if(state.getEntity(another).getClass() ==Empty.class){
+//                        state.move(rightPosition,another);
+//                        state.move(oldPosition,rightPosition);
+//                        state.checkpoint();
+//                        return new ActionResult.Success(action);
+//                    }else new ActionResult.Failed(action, "You have met a wall");
+//                }
+//                return new ActionResult.Failed(action, "You have met a wall");
+//            case "hk.ust.comp3021.actions.Move$Left":
+//                if (state.getEntity(leftPosition).getClass() == Empty.class) {
+//                    state.move(oldPosition,leftPosition );
+//                    return new ActionResult.Success(action);
+//                }else if (state.getEntity(leftPosition).getClass() == Box.class) {
+//                    Position another = new Position(leftPosition.x()-1, rightPosition.y());
+//                    if(state.getEntity(another).getClass() ==Empty.class){
+//                        state.move(leftPosition,another);
+//                        state.move(oldPosition,leftPosition);
+//                        state.checkpoint();
+//                        return new ActionResult.Success(action);
+//                    }else new ActionResult.Failed(action, "You have met a wall");
+//                }
+//                return new ActionResult.Failed(action, "You have met a wall");
+//            case "hk.ust.comp3021.actions.Move$Up":
+//                if (state.getEntity(upPosition).getClass() == Empty.class) {
+//                    state.move(oldPosition,upPosition );
+//                    return new ActionResult.Success(action);
+//                }else if (state.getEntity(upPosition).getClass() == Box.class) {
+//                    Position another = new Position(upPosition.x(), rightPosition.y()-1);
+//                    if(state.getEntity(another).getClass() ==Empty.class){
+//                        state.move(upPosition,another);
+//                        state.move(oldPosition,upPosition);
+//                        state.checkpoint();
+//                        return new ActionResult.Success(action);
+//                    }else new ActionResult.Failed(action, "You have met a wall");
+//                }
+//                return new ActionResult.Failed(action, "You have met a wall");
+//            case "hk.ust.comp3021.actions.Move$Exit":
+//                this.exit = true;
+//                return new ActionResult.Success(action);
+//            case "hk.ust.comp3021.actions.Move$Undo":
+//                if(state.getUndoQuota().get()>0){
+//                    return new ActionResult.Success(action);
+//                }
+//                return new ActionResult.Failed(action, UNDO_QUOTA_RUN_OUT);
+//            default:
+//                return new ActionResult.Failed(action, "You have met a wall");
+
+//        }
 //        throw new NotImplementedException();
     }
 }
