@@ -33,7 +33,7 @@ public class TerminalRenderingEngine implements RenderingEngine {
         for (int y = 0; y <= state.getMapMaxHeight(); y++) {
             for (int x = 0; x <= state.getMapMaxWidth(); x++) {
                 final var entity = state.getEntity(Position.of(x, y));
-                System.out.print(entity);
+//                System.out.print(entity);
                 final var charToPrint = switch (entity) {
                     // TODO
                     case Wall ignored -> '#';

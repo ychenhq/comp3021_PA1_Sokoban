@@ -1,7 +1,6 @@
 package hk.ust.comp3021.game;
 
 import hk.ust.comp3021.entities.*;
-import hk.ust.comp3021.utils.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
@@ -25,21 +24,21 @@ import java.util.Set;
  */
 public class GameState {
 
-    public int _width;
-    public int _height;
-    public String[] _lastStepMap;
-    public String[] _checkpointMap;
-    public String[] _initialMap;
-    public String[] _mapString;
-    public Set<Position> _dest;
-    public Set<Position> _boxDest;
-    public ArrayList<Integer> _players;
-    public Set<Position> _playerPosition;
-    public ArrayList<Position> _wall;
-    public int _undoLimit;
-    public int _undo;
-    public ArrayList<Position> _historyMovements;
-    public boolean _hasCheckPoint;
+    public int Width;
+    public int Height;
+    public String[] LastStepMap;
+    public String[] CheckpointMap;
+    public String[] InitialMap;
+    public String[] MapString;
+    public Set<Position> Dest;
+    public Set<Position> BoxDest;
+    public ArrayList<Integer> Players;
+    public Set<Position> PlayerPosition;
+    public ArrayList<Position> Wall;
+    public int UndoLimit;
+    public int Undo;
+    public ArrayList<Position> HistoryMovements;
+    public boolean HasCheckPoint;
     /**
      * Create a running game state from a game map.
      *
@@ -48,18 +47,18 @@ public class GameState {
     public GameState(@NotNull GameMap map) {
         // TODO
 //        curPosition = map._initialBoxDest.get(map._initialBoxDest.size()-1);
-        _height = map._height;
-        _width = map._width;
-        _historyMovements = new ArrayList<>();
-        _players = new ArrayList<>();
-        _boxDest = new HashSet<>();
-        _initialMap = map._mapStringNonStatic.clone();
-        _undoLimit = map._undoLimit;
-        _mapString = map._mapStringNonStatic.clone();
-        _players = map._playersNonStatic;
-        _wall = map._wallNonStatic;
-        _undo=0;
-        _boxDest = map._initialBoxDest;
+        Height = map._height;
+        Width = map._width;
+        HistoryMovements = new ArrayList<>();
+        Players = new ArrayList<>();
+        BoxDest = new HashSet<>();
+        InitialMap = map._mapStringNonStatic.clone();
+        UndoLimit = map._undoLimit;
+        MapString = map._mapStringNonStatic.clone();
+        Players = map._playersNonStatic;
+        Wall = map._wallNonStatic;
+        Undo =0;
+        BoxDest = map._initialBoxDest;
 //        throw new NotImplementedException();
     }
 
@@ -71,9 +70,9 @@ public class GameState {
      */
     public @Nullable Position getPlayerPositionById(int id) {
         // TODO
-        for(int i =1; i<_mapString.length;i++){
-            for(int j =0; j<_mapString[i].length();j++){
-                if(_mapString[i].charAt(j)-'A' == id){
+        for(int i = 1; i< MapString.length; i++){
+            for(int j = 0; j< MapString[i].length(); j++){
+                if(MapString[i].charAt(j)-'A' == id){
                     return new Position(j,i-1);
                 }
             }
@@ -89,15 +88,15 @@ public class GameState {
      */
     public @NotNull Set<Position> getAllPlayerPositions() {
         // TODO
-        _playerPosition = new HashSet<>();
-        for(int i =1; i<_mapString.length;i++){
-            for(int j =0; j<_mapString[i].length();j++){
-                if(_mapString[i].charAt(j) >='A'&& _mapString[i].charAt(j) <='Z'){
-                    _playerPosition.add(new Position(j,i-1));
+        PlayerPosition = new HashSet<>();
+        for(int i = 1; i< MapString.length; i++){
+            for(int j = 0; j< MapString[i].length(); j++){
+                if(MapString[i].charAt(j) >='A'&& MapString[i].charAt(j) <='Z'){
+                    PlayerPosition.add(new Position(j,i-1));
                 }
             }
         }
-        return _playerPosition;
+        return PlayerPosition;
 //        throw new NotImplementedException();
     }
 
@@ -111,9 +110,9 @@ public class GameState {
         // TODO
         int x = position.x();
         int y = position.y()+1;
-        if(x>= _width || y>=_height)return null;
+        if(x>= Width || y>= Height)return null;
 //        System.out.print(_mapString[y].length()+'\n');
-        char _char = _mapString[y].charAt(x);
+        char _char = MapString[y].charAt(x);
 //        System.out.print(_char+"\n");
         if (_char>= 'A' && _char<='Z' ){
             return new Player(_char -'A');
@@ -136,20 +135,20 @@ public class GameState {
      */
     public @NotNull @Unmodifiable Set<Position> getDestinations() {
         // TODO
-        return _dest;
+        return Dest;
 //        throw new NotImplementedException();
     }
 
     public Set<Position> getBoxPlaces(){
-        _boxDest = new HashSet<>();
-        for(int i =1; i<_mapString.length;i++){
-            for(int j =0; j<_mapString[i].length();j++){
-                if(_mapString[i].charAt(j) >='a' && _mapString[i].charAt(j) <='z'){
-                    _boxDest.add(new Position(j,i-1));
+        BoxDest = new HashSet<>();
+        for(int i = 1; i< MapString.length; i++){
+            for(int j = 0; j< MapString[i].length(); j++){
+                if(MapString[i].charAt(j) >='a' && MapString[i].charAt(j) <='z'){
+                    BoxDest.add(new Position(j,i-1));
                 }
             }
         }
-        return _boxDest;
+        return BoxDest;
     }
 
     /**
@@ -161,7 +160,7 @@ public class GameState {
      */
     public Optional<Integer> getUndoQuota() {
         // TODO
-        int remain = _undoLimit - _undo;
+        int remain = UndoLimit - Undo;
         return Optional.of(remain);
 //        throw new NotImplementedException();
     }
@@ -177,7 +176,7 @@ public class GameState {
         for(Position pos : getBoxPlaces()){
             int x = pos.x();
             int y = pos.y()+1;
-            if(!(_initialMap[y].charAt(x)=='@')){
+            if(!(InitialMap[y].charAt(x)=='@')){
                 return false;
             }
         }
@@ -200,16 +199,16 @@ public class GameState {
         int y_from = from.y()+1;
         int x_to = to.x();
         int y_to = to.y()+1;
-        char charFrom = _mapString[y_from].charAt(x_from);
-        char charTo = _mapString[y_to].charAt(x_to);
+        char charFrom = MapString[y_from].charAt(x_from);
+        char charTo = MapString[y_to].charAt(x_to);
 //        _historyMovements.add(from);
 //        _historyMovements.add(to);
         if(charFrom>='a' && charFrom<='z'){
-            _lastStepMap = _mapString.clone();
+            LastStepMap = MapString.clone();
         }
         if(charTo =='@') charTo = '.';
-        _mapString[y_from] = _mapString[y_from].substring(0,x_from)+charTo+ _mapString[y_from].substring(x_from+1);
-        _mapString[y_to] = _mapString[y_to].substring(0,x_to)+charFrom+_mapString[y_to].substring(x_to+1);
+        MapString[y_from] = MapString[y_from].substring(0,x_from)+charTo+ MapString[y_from].substring(x_from+1);
+        MapString[y_to] = MapString[y_to].substring(0,x_to)+charFrom+ MapString[y_to].substring(x_to+1);
 //        throw new NotImplementedException();
     }
 
@@ -223,8 +222,8 @@ public class GameState {
      */
     public void checkpoint() {
         // TODO
-        _hasCheckPoint = true;
-        _checkpointMap = _lastStepMap;
+        HasCheckPoint = true;
+        CheckpointMap = LastStepMap;
 //        System.out.print( "_lastStepMap2" + _lastStepMap[2].toString()+'\n');
 //        Position from = _historyMovements.get(_historyMovements.size()-2);
 //        Position to = _historyMovements.get(_historyMovements.size()-1);
@@ -252,16 +251,16 @@ public class GameState {
      */
     public void undo() {
         // TODO
-        if(_hasCheckPoint){
+        if(HasCheckPoint){
 //            System.out.print("has check point");
 //            System.out.print("_mapString"+ _mapString[2].toString());
 //            System.out.print("_checkpointMap"+ _checkpointMap[2].toString());
-            _mapString = _checkpointMap.clone();
-            _undo++;
-            _hasCheckPoint = false;
+            MapString = CheckpointMap.clone();
+            Undo++;
+            HasCheckPoint = false;
         }else{
-            _mapString = _initialMap;
-            _undo=0;
+            MapString = InitialMap;
+            Undo =0;
         }
 
 //        throw new NotImplementedException();
@@ -275,7 +274,7 @@ public class GameState {
      */
     public int getMapMaxWidth() {
         // TODO
-        return  _width;
+        return Width;
 //        throw new NotImplementedException();
     }
 
@@ -287,7 +286,7 @@ public class GameState {
      */
     public int getMapMaxHeight() {
         // TODO
-        return _height;
+        return Height;
 //        throw new NotImplementedException();
     }
 }

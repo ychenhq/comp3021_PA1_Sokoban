@@ -95,17 +95,6 @@ class AbstractSokobanGameTest {
         assertTrue(game.shouldStop());
     }
 
-    @Tag(TestKind.PUBLIC)
-    @Test
-    void testShouldStopWhenExit() {
-        final var gameState = mock(GameState.class);
-        final var game = new SokobanGameForTesting(gameState);
-        final var inputStream = fixValueStream("exit");
-
-        final var inputEngine = new Scanner(inputStream);
-        assertTrue(game.shouldStop());
-    }
-
     private static class SokobanGameForTesting extends AbstractSokobanGame {
 
         protected SokobanGameForTesting(GameState gameState) {
