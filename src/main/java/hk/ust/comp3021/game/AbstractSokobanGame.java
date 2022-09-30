@@ -13,8 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Scanner;
 
-import static hk.ust.comp3021.utils.StringResources.INVALID_INPUT_MESSAGE;
-import static hk.ust.comp3021.utils.StringResources.PLAYER_NOT_FOUND;
+import static hk.ust.comp3021.utils.StringResources.*;
 
 /**
  * A base implementation of Sokoban Game.
@@ -22,9 +21,10 @@ import static hk.ust.comp3021.utils.StringResources.PLAYER_NOT_FOUND;
 public abstract class AbstractSokobanGame implements SokobanGame {
     @NotNull
     protected final GameState state;
+    public boolean exit;
 
     protected AbstractSokobanGame(@NotNull GameState gameState) {
-        this.state = gameState;
+        this.state = gameState; this.exit = false;
     }
 
     /**
@@ -33,7 +33,7 @@ public abstract class AbstractSokobanGame implements SokobanGame {
      */
     protected boolean shouldStop() {
         // TODO
-        if (state.isWin())return true;
+        if (state.isWin() || this.exit == true)return true;
         return false;
 //        throw new NotImplementedException();
     }
@@ -109,6 +109,14 @@ public abstract class AbstractSokobanGame implements SokobanGame {
                     }else new ActionResult.Failed(action, "You have met a wall");
                 }
                 return new ActionResult.Failed(action, "You have met a wall");
+            case "hk.ust.comp3021.actions.Move$Exit":
+                this.exit = true;
+                return new ActionResult.Success(action);
+            case "hk.ust.comp3021.actions.Move$Undo":
+                if(state.getUndoQuota().get()>0){
+                    return new ActionResult.Success(action);
+                }
+                return new ActionResult.Failed(action, UNDO_QUOTA_RUN_OUT);
             default:
                 return new ActionResult.Failed(action, "You have met a wall");
 

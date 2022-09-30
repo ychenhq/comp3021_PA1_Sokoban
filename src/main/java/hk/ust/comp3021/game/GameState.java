@@ -31,6 +31,7 @@ public class GameState {
     public String[] _checkpointMap;
     public String[] _initialMap;
     public String[] _mapString;
+    public Set<Position> _dest;
     public Set<Position> _boxDest;
     public ArrayList<Integer> _players;
     public Set<Position> _playerPosition;
@@ -50,8 +51,11 @@ public class GameState {
         _height = map._height;
         _width = map._width;
         _historyMovements = new ArrayList<>();
+        _players = new ArrayList<>();
+        _boxDest = new HashSet<>();
+        _initialMap = map._mapStringNonStatic.clone();
         _undoLimit = map._undoLimit;
-        _mapString = map._mapStringNonStatic;
+        _mapString = map._mapStringNonStatic.clone();
         _players = map._playersNonStatic;
         _wall = map._wallNonStatic;
         _undo=0;
@@ -110,7 +114,7 @@ public class GameState {
         if(x>= _width || y>=_height)return null;
 //        System.out.print(_mapString[y].length()+'\n');
         char _char = _mapString[y].charAt(x);
-        System.out.print(_char+"\n");
+//        System.out.print(_char+"\n");
         if (_char>= 'A' && _char<='Z' ){
             return new Player(_char -'A');
         }else if(_char>='a' && _char <='z'){
@@ -132,16 +136,20 @@ public class GameState {
      */
     public @NotNull @Unmodifiable Set<Position> getDestinations() {
         // TODO
+        return _dest;
+//        throw new NotImplementedException();
+    }
+
+    public Set<Position> getBoxPlaces(){
         _boxDest = new HashSet<>();
         for(int i =1; i<_mapString.length;i++){
             for(int j =0; j<_mapString[i].length();j++){
-                if(_mapString[i].charAt(j) >='a'&& _mapString[i].charAt(j) <='z'){
+                if(_mapString[i].charAt(j) >='a' && _mapString[i].charAt(j) <='z'){
                     _boxDest.add(new Position(j,i-1));
                 }
             }
         }
         return _boxDest;
-//        throw new NotImplementedException();
     }
 
     /**
@@ -166,10 +174,10 @@ public class GameState {
      */
     public boolean isWin() {
 // TODO
-        for(Position pos : _boxDest){
+        for(Position pos : getBoxPlaces()){
             int x = pos.x();
             int y = pos.y()+1;
-            if(!(_mapString[y].charAt(x)>='a' && _mapString[x].charAt(y)<='z')){
+            if(!(_initialMap[y].charAt(x)=='@')){
                 return false;
             }
         }
@@ -199,6 +207,7 @@ public class GameState {
         if(charFrom>='a' && charFrom<='z'){
             _lastStepMap = _mapString.clone();
         }
+        if(charTo =='@') charTo = '.';
         _mapString[y_from] = _mapString[y_from].substring(0,x_from)+charTo+ _mapString[y_from].substring(x_from+1);
         _mapString[y_to] = _mapString[y_to].substring(0,x_to)+charFrom+_mapString[y_to].substring(x_to+1);
 //        throw new NotImplementedException();
