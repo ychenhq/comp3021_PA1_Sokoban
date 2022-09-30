@@ -1,11 +1,16 @@
 package hk.ust.comp3021.tui;
 
 
+import hk.ust.comp3021.actions.Action;
+import hk.ust.comp3021.actions.ActionResult;
+import hk.ust.comp3021.actions.InvalidInput;
 import hk.ust.comp3021.game.AbstractSokobanGame;
 import hk.ust.comp3021.game.GameState;
 import hk.ust.comp3021.game.InputEngine;
 import hk.ust.comp3021.game.RenderingEngine;
 import hk.ust.comp3021.utils.NotImplementedException;
+
+import static hk.ust.comp3021.utils.StringResources.INVALID_INPUT_MESSAGE;
 
 /**
  * A Sokoban game running in the terminal.
@@ -40,8 +45,13 @@ public class TerminalSokobanGame extends AbstractSokobanGame {
     public void run() {
         // TODO
         while(!shouldStop()){
-            processAction(this.inputEngine.fetchAction());
-            renderingEngine.render(this.state);
+            var result = processAction(this.inputEngine.fetchAction());
+            if(result.getClass() == ActionResult.Failed.class){
+                renderingEngine.render(this.state);
+                renderingEngine.message(INVALID_INPUT_MESSAGE);
+            }else {
+                renderingEngine.render(this.state);
+            }
         }
 //        throw new NotImplementedException();
     }

@@ -13,6 +13,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Scanner;
 
+import static hk.ust.comp3021.utils.StringResources.INVALID_INPUT_MESSAGE;
+import static hk.ust.comp3021.utils.StringResources.PLAYER_NOT_FOUND;
+
 /**
  * A base implementation of Sokoban Game.
  */
@@ -42,7 +45,7 @@ public abstract class AbstractSokobanGame implements SokobanGame {
     protected ActionResult processAction(@NotNull Action action) {
         // TODO
         Position oldPosition = state.getPlayerPositionById(action.getInitiator());
-        if(oldPosition==null)  return new ActionResult.Failed(action, "There is no initiator");
+        if(oldPosition==null)  return new ActionResult.Failed(action, INVALID_INPUT_MESSAGE);
         Position downPosition = new Position(oldPosition.x(), oldPosition.y()+1);
         Position rightPosition = new Position(oldPosition.x()+1, oldPosition.y());
         Position leftPosition = new Position(oldPosition.x()-1, oldPosition.y());

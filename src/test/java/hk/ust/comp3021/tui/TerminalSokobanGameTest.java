@@ -27,8 +27,10 @@ class TerminalSokobanGameTest {
             .thenReturn(new InvalidInput(0, ""))
             .thenReturn(new Exit(0));
 
+        System.out.print("finished this");
         final var game = new TerminalSokobanGame(gameState, inputEngine, renderingEngine);
         game.run();
+        System.out.print("finished this too");
 
         final var inOrder = inOrder(inputEngine, renderingEngine);
 
